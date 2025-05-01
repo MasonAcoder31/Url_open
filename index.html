@@ -1,11 +1,30 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Open Any Site</title>
-  </head>
-  <body>
-    <h2>Open a Website in a New Tab</h2>
-    <input id="urlInput" placeholder="https://example.com" style="width:300px;">
-    <button onclick="window.open(document.getElementById('urlInput').value, '_blank')">Open</button>
-  </body>
+<head>
+  <title>Open a Site in About:Blank</title>
+</head>
+<body>
+  <h2>Open a Website in a New Tab (about:blank)</h2>
+  <input id="urlInput" placeholder="https://example.com" style="width:300px;">
+  <button onclick="openAboutBlank()">Open</button>
+
+  <script>
+    function openAboutBlank() {
+      const url = document.getElementById("urlInput").value.trim();
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        alert("Please include http:// or https://");
+        return;
+      }
+
+      // Open about:blank first, then set its location
+      const newTab = window.open("about:blank");
+      if (newTab) {
+        newTab.document.write("Redirecting...");
+        newTab.location = url;
+      } else {
+        alert("Popup blocked! Please allow pop-ups for this site.");
+      }
+    }
+  </script>
+</body>
 </html>
