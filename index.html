@@ -1,28 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Open a Site in About:Blank</title>
+  <title>Basic About:Blank Launcher</title>
 </head>
 <body>
-  <h2>Open a Website in a New Tab (about:blank)</h2>
+  <h2>Launch a Website in about:blank</h2>
   <input id="urlInput" placeholder="https://example.com" style="width:300px;">
-  <button onclick="openAboutBlank()">Open</button>
+  <button onclick="launch()">Open</button>
 
   <script>
-    function openAboutBlank() {
-      const url = document.getElementById("urlInput").value.trim();
-      if (!url.startsWith("http://") && !url.startsWith("https://")) {
-        alert("Please include http:// or https://");
+    function launch() {
+      const url = document.getElementById('urlInput').value.trim();
+      if (!url.startsWith("http")) {
+        alert("Include https:// or http://");
         return;
       }
 
-      // Open about:blank first, then set its location
-      const newTab = window.open("about:blank");
+      const newTab = window.open("about:blank", "_blank");
       if (newTab) {
-        newTab.document.write("Redirecting...");
-        newTab.location = url;
+        newTab.document.write(`
+          <html>
+            <body style="margin:0;padding:0;">
+              <iframe src="${url}" style="width:100vw;height:100vh;border:none;"></iframe>
+            </body>
+          </html>
+        `);
+        newTab.document.close();
       } else {
-        alert("Popup blocked! Please allow pop-ups for this site.");
+        alert("Popup blocked!");
       }
     }
   </script>
