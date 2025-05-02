@@ -1,34 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Basic About:Blank Launcher</title>
+  <title>Ultraviolet Launcher</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    input {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h2>Launch a Website in about:blank</h2>
-  <input id="urlInput" placeholder="https://example.com" style="width:300px;">
+  <h1>Ultraviolet Proxy Launcher</h1>
+  <p>Enter a website URL (like https://youtube.com)</p>
+  <input id="urlInput" placeholder="https://example.com">
   <button onclick="launch()">Open</button>
 
   <script>
+    function encodeTarget(url) {
+      return btoa(url);
+    }
+
     function launch() {
-      const url = document.getElementById('urlInput').value.trim();
-      if (!url.startsWith("http")) {
-        alert("Include https:// or http://");
+      const input = document.getElementById('urlInput').value.trim();
+      if (!input.startsWith("http")) {
+        alert("Please include https:// or http:// in the URL.");
         return;
       }
 
+      const encodedUrl = encodeTarget(input);
+      const proxyUrl = `https://ultraviolet.segso.net/service/${encodedUrl}`;
+
       const newTab = window.open("about:blank", "_blank");
-      if (newTab) {
-        newTab.document.write(`
-          <html>
-            <body style="margin:0;padding:0;">
-              <iframe src="${url}" style="width:100vw;height:100vh;border:none;"></iframe>
-            </body>
-          </html>
-        `);
-        newTab.document.close();
-      } else {
-        alert("Popup blocked!");
-      }
+      newTab.document.write(`
+        <html>
+          <body style="margin:0;padding:0;">
+            <iframe src="${proxyUrl}" style="width:100vw;height:100vh;border:none;"></iframe>
+          </body>
+        </html>
+      `);
+      newTab.document.close();
     }
   </script>
 </body>
