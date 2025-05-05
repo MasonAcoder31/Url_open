@@ -1,35 +1,82 @@
-<script>
-  function encodeTarget(url) {
-    return encodeURIComponent(url);
-  }
-
-  function launch() {
-    const input = document.getElementById('urlInput').value.trim();
-    
-    // Validate URL format
-    try {
-      new URL(input);
-    } catch {
-      alert("Invalid URL format. Please include http:// or https://");
-      return;
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ultraviolet Proxy Launcher</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 50px;
     }
-
-    // Prepend the best proxy: corsproxy.io
-    const proxyUrl = `https://corsproxy.io/?url=${encodeTarget(input)}`;
-
-    const newTab = window.open("", "_blank");
-    if (!newTab || newTab.closed === undefined) {
-      alert("Pop-up blocked! Please allow pop-ups for this site.");
-      return;
+    input, select {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+      margin-bottom: 10px;
     }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      input, select {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Ultraviolet Proxy Launcher</h1>
+  <p>Enter a website URL and choose a proxy:</p>
+  
+  <input id="urlInput" placeholder="https://example.com">
+  
+  <select id="proxySelect">
+    <option value="https://corsproxy.io/?url=">corsproxy.io</option>
+    <option value="https://api.allorigins.win/raw?url=">allorigins.win</option>
+    <option value="https://thingproxy.freeboard.io/fetch/">thingproxy.freeboard.io</option>
+    <option value="https://api.codetabs.com/v1/proxy?quest=">codetabs.com</option>
+    <option value="https://test.cors.workers.dev/?">test.cors.workers.dev</option>
+  </select>
+  
+  <br>
+  <button onclick="launch()">Open</button>
 
-    newTab.document.write(`
-      <html>
-        <body style="margin:0;padding:0;">
-          <iframe src="${proxyUrl}" style="width:100vw;height:100vh;border:none;"></iframe>
-        </body>
-      </html>
-    `);
-    newTab.document.close();
-  }
-</script>
+  <script>
+    function launch() {
+      const input = document.getElementById('urlInput').value.trim();
+      // Strict URL validation
+      try {
+        new URL(input);
+      } catch {
+        alert("Invalid URL. Please include http:// or https://");
+        return;
+      }
+
+      // Get selected proxy prefix
+      const proxyPrefix = document.getElementById('proxySelect').value;
+      const proxiedUrl = proxyPrefix + encodeURIComponent(input);
+
+      // Open in new tab with iframe
+      const newTab = window.open("", "_blank");
+      if (!newTab || newTab.closed === undefined) {
+        alert("Pop-up blocked! Please allow pop-ups for this site.");
+        return;
+      }
+
+      newTab.document.write(`
+        <html>
+          <body style="margin:0;padding:0;">
+            <iframe
+              src="${proxiedUrl}"
+              style="width:100vw;height:100vh;border:none;">
+            </iframe>
+          </body>
+        </html>
+      `);
+      newTab.document.close();
+    }
+  </script>
+</body>
+</html>
