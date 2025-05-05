@@ -1,82 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Ultraviolet Proxy Launcher</title>
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 50px;
+    body { font-family: 'Inter', sans-serif; margin:0; padding:0; background:#f5f7fa; color:#333; }
+    header { background:#4a90e2; color:white; text-align:center; padding:2rem 1rem; }
+    header h1 { margin:0; font-weight:600; }
+    main { max-width:960px; margin:2rem auto; padding:0 1rem; }
+    .controls { display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:2rem; }
+    .controls input, .controls select, .controls button {
+      flex:1; min-width:200px; padding:0.75rem; font-size:1rem; border:1px solid #ccc; border-radius:4px;
     }
-    input, select {
-      padding: 10px;
-      width: 300px;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    @media (max-width: 600px) {
-      input, select {
-        width: 90%;
-      }
-    }
+    .controls button { background:#4a90e2; color:white; border:none; cursor:pointer; }
+    .controls button:hover { background:#357ab8; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.5rem; }
+    .card { background:white; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); padding:1rem; }
+    .card h3 { margin-top:0; font-size:1.1rem; color:#4a90e2; }
+    .card code { display:block; background:#eef1f5; padding:0.25rem; margin:0.5rem 0; border-radius:4px; }
+    .footer { text-align:center; margin:3rem 0 1rem; }
+    .footer a { color:#4a90e2; text-decoration:none; font-weight:600; }
   </style>
 </head>
 <body>
-  <h1>Ultraviolet Proxy Launcher</h1>
-  <p>Enter a website URL and choose a proxy:</p>
-  
-  <input id="urlInput" placeholder="https://example.com">
-  
-  <select id="proxySelect">
-    <option value="https://corsproxy.io/?url=">corsproxy.io</option>
-    <option value="https://api.allorigins.win/raw?url=">allorigins.win</option>
-    <option value="https://thingproxy.freeboard.io/fetch/">thingproxy.freeboard.io</option>
-    <option value="https://api.codetabs.com/v1/proxy?quest=">codetabs.com</option>
-    <option value="https://test.cors.workers.dev/?">test.cors.workers.dev</option>
-  </select>
-  
-  <br>
-  <button onclick="launch()">Open</button>
+
+  <header>
+    <h1>Ultraviolet Proxy Launcher</h1>
+    <p>Your toolkit for bypassing CORS & site blocks</p>
+  </header>
+
+  <main>
+    <div class="controls">
+      <input id="urlInput" type="url" placeholder="https://example.com" required>
+      <select id="proxySelect">
+        <!-- Populate via JS -->
+      </select>
+      <button id="openBtn">Open</button>
+      <button onclick="window.open('https://masonacoder31.github.io/Url_open/','_blank')">
+        View on GitHub Pages
+      </button>
+    </div>
+
+    <div class="cards" id="proxyCards">
+      <!-- Cards injected by JS -->
+    </div>
+  </main>
+
+  <footer class="footer">
+    &copy; 2025 Ultraviolet Launcher • <a href="https://github.com/masonacoder31/Url_open" target="_blank">Source on GitHub</a>
+  </footer>
 
   <script>
-    function launch() {
-      const input = document.getElementById('urlInput').value.trim();
-      // Strict URL validation
-      try {
-        new URL(input);
-      } catch {
-        alert("Invalid URL. Please include http:// or https://");
-        return;
+    const proxies = [
+      { name: 'Ultraviolet Proxy', type:'uv', desc:'Official Base64 proxy', prefix:'https://forskillz.potatolord5.repl.co/service/', encode:'btoa' },
+      { name: 'corsproxy.io', prefix:'https://corsproxy.io/?url=', desc:'1 B req/mo, 500 TB BW, low latency' },
+      { name: 'CORS.SH', prefix:'https://proxy.cors.sh/', desc:'API key, fast response' },
+      { name: 'HTMLDriven', prefix:'https://cors-proxy.htmldriven.com/?url=', desc:'Lightweight, composer solution' },
+      { name: 'thingproxy', prefix:'https://thingproxy.freeboard.io/fetch/', desc:'10 rps, great for tests' },
+      { name: 'allorigins.win', prefix:'https://api.allorigins.win/raw?url=', desc:'50 req/min, raw content' },
+      { name: 'allorigins.cf', prefix:'https://api.allorigins.cf/raw?url=', desc:'Mirror of AllOrigins' },
+      { name: 'yacdn.org', prefix:'https://yacdn.org/proxy/', desc:'CDN-backed, cached 24 h' },
+      { name: 'universal-cors-proxy', prefix:'https://universal-cors-proxy.glitch.me/', desc:'Open-source Glitch' },
+      { name: 'jsonp.afeld.me', prefix:'https://jsonp.afeld.me/?url=', desc:'JSONP wrapper' },
+      { name: 'Whatever Origin', prefix:'http://www.whateverorigin.org/get?url=', desc:'Clone of AnyOrigin' },
+      { name: 'crossorigin.me', prefix:'https://crossorigin.me/', desc:'No-config public proxy' },
+      { name: 'cors-anywhere', prefix:'https://cors-anywhere.herokuapp.com/', desc:'Demo only; add /URL' },
+      { name: 'api.codetabs', prefix:'https://api.codetabs.com/v1/proxy?quest=', desc:'5 MB/req, 5 req/s' },
+      { name: 'cors.io', prefix:'https://cors.io/?', desc:'Simple dev proxy' },
+      { name: 'test.cors.workers', prefix:'https://test.cors.workers.dev/?', desc:'Cloudflare Workers demo' },
+      { name: 'norawproxy', prefix:'https://norawproxy.appspot.com/?url=', desc:'GET-only proxy' },
+      { name: 'cors.workers.dev', prefix:'https://cors.ryanking13.workers.dev/?u=', desc:'Experimental Worker' }
+    ];
+
+    const select = document.getElementById('proxySelect');
+    const cards = document.getElementById('proxyCards');
+    proxies.forEach(p => {
+      // Dropdown
+      const opt = document.createElement('option');
+      opt.value = p.name;
+      opt.textContent = p.name;
+      select.appendChild(opt);
+      // Cards
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h3>${p.name}</h3>
+        <code title="Prefix">${p.prefix}${p.encode==='btoa'?'<Base64>'+'...' : '<URL>'}</code>
+        <p>${p.desc}</p>
+      `;
+      cards.appendChild(card);
+    });
+
+    document.getElementById('openBtn').onclick = () => {
+      const url = document.getElementById('urlInput').value.trim();
+      try { new URL(url); } catch {
+        return alert('Please enter a valid URL (include http:// or https://)');
       }
-
-      // Get selected proxy prefix
-      const proxyPrefix = document.getElementById('proxySelect').value;
-      const proxiedUrl = proxyPrefix + encodeURIComponent(input);
-
-      // Open in new tab with iframe
-      const newTab = window.open("", "_blank");
-      if (!newTab || newTab.closed === undefined) {
-        alert("Pop-up blocked! Please allow pop-ups for this site.");
-        return;
+      const proxy = proxies.find(p => p.name === select.value);
+      let target = proxy.prefix;
+      if (proxy.encode === 'btoa') {
+        target += btoa(url);
+      } else {
+        target += encodeURIComponent(url);
       }
-
-      newTab.document.write(`
-        <html>
-          <body style="margin:0;padding:0;">
-            <iframe
-              src="${proxiedUrl}"
-              style="width:100vw;height:100vh;border:none;">
-            </iframe>
-          </body>
-        </html>
-      `);
-      newTab.document.close();
-    }
+      const win = window.open('', '_blank');
+      if (!win || win.closed===undefined) {
+        return alert('Pop-up blocked! Please enable pop-ups for this site.');
+      }
+      win.document.write(`<iframe src="${target}" style="width:100vw;height:100vh;border:none;"></iframe>`);
+      win.document.close();
+    };
   </script>
+
 </body>
 </html>
