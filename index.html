@@ -1,57 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Ultraviolet Launcher</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    input {
-      padding: 10px;
-      width: 300px;
-      font-size: 16px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-left: 10px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <h1>Ultraviolet Proxy Launcher</h1>
-  <p>Enter a website URL (like https://youtube.com)</p>
-  <input id="urlInput" placeholder="https://example.com">
-  <button onclick="launch()">Open</button>
+<script>
+  function encodeTarget(url) {
+    return encodeURIComponent(url);
+  }
 
-  <script>
-    function encodeTarget(url) {
-      return btoa(url);
+  function launch() {
+    const input = document.getElementById('urlInput').value.trim();
+    
+    // Validate URL format
+    try {
+      new URL(input);
+    } catch {
+      alert("Invalid URL format. Please include http:// or https://");
+      return;
     }
 
-    function launch() {
-      const input = document.getElementById('urlInput').value.trim();
-      if (!input.startsWith("http")) {
-        alert("Please include https:// or http:// in the URL.");
-        return;
-      }
+    // Prepend the best proxy: corsproxy.io
+    const proxyUrl = `https://corsproxy.io/?url=${encodeTarget(input)}`;
 
-      const encodedUrl = encodeTarget(input);
-      const proxyUrl = `https://forskillz.potatolord5.repl.co/service/${encodedUrl}`;
-
-      const newTab = window.open("about:blank", "_blank");
-      newTab.document.write(`
-        <html>
-          <body style="margin:0;padding:0;">
-            <iframe src="${proxyUrl}" style="width:100vw;height:100vh;border:none;"></iframe>
-          </body>
-        </html>
-      `);
-      newTab.document.close();
+    const newTab = window.open("", "_blank");
+    if (!newTab || newTab.closed === undefined) {
+      alert("Pop-up blocked! Please allow pop-ups for this site.");
+      return;
     }
-  </script>
-</body>
-</html>
+
+    newTab.document.write(`
+      <html>
+        <body style="margin:0;padding:0;">
+          <iframe src="${proxyUrl}" style="width:100vw;height:100vh;border:none;"></iframe>
+        </body>
+      </html>
+    `);
+    newTab.document.close();
+  }
+</script>
